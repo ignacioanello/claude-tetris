@@ -11,7 +11,7 @@ const COLORS = [
   '#ba68c8', // T - purple
   '#81c784', // S - green
   '#e57373', // Z - red
-  '#90caf9', // J - pale blue
+  '#bbdefb', // J - pale blue
   '#ffb74d', // L - orange
   '#9e9e9e', // N - tuerca (gris metálico)
 ];
