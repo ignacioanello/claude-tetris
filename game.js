@@ -16,6 +16,79 @@ const COLORS = [
   '#9e9e9e', // N - tuerca (gris metálico)
 ];
 
+// ---- Temas visuales / skins ----
+// Cada skin define su paleta (9 entradas: índice 0 = null, 1–8 = piezas, misma
+// convención que COLORS) y una función render(ctx, x, y, size, color) que pinta
+// UN bloque. `x`/`y` llegan en celdas y se multiplican por `size` dentro de
+// render, igual que hacía drawBlock (`x * size + 1`, etc.).
+const SKINS = {
+  retro: {
+    label: 'Retro',
+    colors: COLORS, // paleta base del juego (el knob documentado); ver arriba
+    render(ctx, x, y, size, color) {
+      const px = x * size + 1, py = y * size + 1, s = size - 2;
+      ctx.fillStyle = color;
+      ctx.fillRect(px, py, s, s);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(px, py, s, 4);
+    },
+  },
+  neon: {
+    label: 'Neón',
+    colors: [null, '#00f0ff', '#ffe600', '#ff3df0', '#25ff8a', '#ff2d4b', '#3d8bff', '#ff9500', '#d0d0d8'],
+    render(ctx, x, y, size, color) {
+      const px = x * size + 1, py = y * size + 1, s = size - 2;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = color;
+      ctx.fillRect(px, py, s, s);
+      // IMPRESCINDIBLE: sin este reset la rejilla, el ghost y el resto de la UI
+      // del canvas quedarían borrosos.
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillRect(px, py, s, 4);
+    },
+  },
+  pastel: {
+    label: 'Pastel',
+    colors: [null, '#a8e6e2', '#fbeeb0', '#e3c2f2', '#bfe6c8', '#f5bcbc', '#c3d9f5', '#f8d6ac', '#d2d2dc'],
+    render(ctx, x, y, size, color) {
+      const px = x * size + 1, py = y * size + 1, s = size - 2;
+      ctx.fillStyle = color;
+      if (typeof ctx.roundRect === 'function') {
+        ctx.beginPath();
+        ctx.roundRect(px, py, s, s, Math.min(6, s / 3));
+        ctx.fill();
+      } else {
+        ctx.fillRect(px, py, s, s);
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.30)';
+      ctx.fillRect(px + 2, py + 2, s - 4, 3);
+    },
+  },
+  pixel: {
+    label: 'Pixel',
+    colors: [null, '#2ac3de', '#f7d354', '#b072d6', '#6dc36d', '#e05a5a', '#5a8fe0', '#e8983a', '#8a8a8a'],
+    render(ctx, x, y, size, color) {
+      const px = x * size + 1, py = y * size + 1, s = size - 2;
+      ctx.fillStyle = color;
+      ctx.fillRect(px, py, s, s);
+      // Textura pixel-art: cuadraditos claros y oscuros repartidos por el bloque.
+      ctx.fillStyle = 'rgba(255,255,255,0.30)';
+      ctx.fillRect(px + 2, py + 2, 3, 3);
+      ctx.fillRect(px + s - 7, py + 3, 2, 2);
+      ctx.fillRect(px + 4, py + s - 7, 2, 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.32)';
+      ctx.fillRect(px + s - 6, py + s - 6, 3, 3);
+      ctx.fillRect(px + 4, py + 6, 2, 2);
+      ctx.fillRect(px + s - 9, py + s - 10, 2, 2);
+    },
+  },
+};
+
+let currentSkin = 'retro';
+
 const PIECES = [
   null,
   [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], // I
@@ -208,15 +281,14 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
+// Envoltorio fino: resuelve la skin activa y delega el pintado de un bloque en
+// su render(). Los bucles de draw()/drawPieceInBox() siguen llamando aquí igual.
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const skin = SKINS[currentSkin];
+  const color = skin.colors[colorIndex];
   context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+  skin.render(context, x, y, size, color);
   context.globalAlpha = 1;
 }
 
@@ -534,6 +606,26 @@ themeToggle.addEventListener('click', () => {
   const isLight = !document.body.classList.contains('light-mode');
   applyTheme(isLight);
   localStorage.setItem('tetris-theme', isLight ? 'light' : 'dark');
+});
+
+// ---- Selector de skin ----
+const skinSelect = document.getElementById('skin-select');
+
+const savedSkin = localStorage.getItem('tetris-skin');
+if (savedSkin && SKINS[savedSkin]) currentSkin = savedSkin;
+skinSelect.value = currentSkin;
+document.body.dataset.skin = currentSkin;
+
+skinSelect.addEventListener('change', () => {
+  const value = skinSelect.value;
+  if (!SKINS[value]) return;
+  currentSkin = value;
+  document.body.dataset.skin = value;
+  localStorage.setItem('tetris-skin', value);
+  // La skin manda sobre el canvas; redibujamos los tres sin recargar.
+  draw();
+  drawNext();
+  drawHold();
 });
 
 init();
