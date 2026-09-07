@@ -40,4 +40,4 @@ Three files, no framework, no bundler:
 
 ## Tunable constants (top of game.js)
 
-`COLS` (10), `ROWS` (20), `BLOCK` (30 px), `COLORS` (array indexed 1–7), `LINE_SCORES`. If you change `COLS`/`ROWS`/`BLOCK`, update the canvas `width`/`height` attributes in `index.html` to match (`COLS×BLOCK` and `ROWS×BLOCK`).
+`COLS` (10), `ROWS` (20), `BLOCK` (30 px), `COLORS` (array indexed 1–8; the `retro` skin's palette — other skins define their own in `SKINS[*].colors`), `LINE_SCORES`. If you change `COLS`/`ROWS`/`BLOCK`, update the canvas `width`/`height` attributes in `index.html` to match (`COLS×BLOCK` and `ROWS×BLOCK`).
