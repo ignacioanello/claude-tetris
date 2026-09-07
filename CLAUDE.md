@@ -15,7 +15,7 @@ python3 -m http.server 8000      # then visit http://localhost:8000
 
 Three files, no framework, no bundler:
 
-- **`index.html`** — DOM structure: `<canvas id="board">` (300×600px) for the playfield, `<canvas id="next-canvas">` (120×120px) for the preview, sidebar HUD (`#score`, `#lines`, `#level`), and a shared overlay `#overlay` for both PAUSE and GAME OVER states.
+- **`index.html`** — DOM structure: `<canvas id="board">` (300×600px) for the playfield, `<canvas id="next-canvas">` (120×120px) for the preview, sidebar HUD (`#score`, `#lines`, `#level`), an `#overlay` for GAME OVER, and a separate `#pause-overlay` (Reanudar / Reiniciar / Ver controles / selector de nivel inicial) for PAUSE.
 - **`style.css`** — Dark/retro arcade theme; uses CSS variables, flexbox, and `backdrop-filter` on overlays.
 - **`game.js`** — All game logic (~305 lines, `'use strict'`, no modules).
 
