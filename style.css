@@ -38,6 +38,26 @@ body.light-mode {
   --toggle-text: #3a3a6a;
 }
 
+/* ---- Skins: solo redefinen el aspecto del canvas ---- */
+/* Van después de body.light-mode para ganar el desempate de especificidad:
+   con una skin no-retro activa, la skin manda sobre --canvas-bg/--grid-line
+   aunque el modo claro esté activo. drawGrid() relee --grid-line en cada
+   llamada vía getComputedStyle, así que basta con redibujar. */
+body[data-skin="neon"] {
+  --canvas-bg: #000000;
+  --grid-line: rgba(255, 255, 255, 0.06);
+}
+
+body[data-skin="pastel"] {
+  --canvas-bg: #f3eef8;
+  --grid-line: #ddd3e6;
+}
+
+body[data-skin="pixel"] {
+  --canvas-bg: #141020;
+  --grid-line: #2b2440;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
@@ -156,6 +176,29 @@ body {
   background: var(--canvas-bg);
   border-radius: 4px;
   transition: background 0.25s, border-color 0.25s;
+}
+
+/* ---- Selector de skin ---- */
+#skin-select {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  color: var(--kbd-text);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+#skin-select:hover {
+  border-color: #7aa2f7;
+  color: #7aa2f7;
+}
+
+#skin-select:focus-visible {
+  outline: 1px solid #7aa2f7;
 }
 
 /* ---- Hold ---- */
